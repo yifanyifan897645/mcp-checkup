@@ -1,0 +1,51 @@
+{
+  "name": "mcp-checkup",
+  "version": "0.1.0",
+  "mcpName": "io.github.yifanyifan897645/mcp-checkup",
+  "description": "MCP server that analyzes your MCP setup: token costs, bloated schemas, duplicate tools, and optimization tips",
+  "main": "dist/index.js",
+  "type": "module",
+  "bin": {
+    "mcp-checkup": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.ts",
+    "start": "node dist/index.js"
+  },
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "token-cost",
+    "context-window",
+    "token-optimization",
+    "mcp-analyzer",
+    "developer-tools",
+    "ai-tools",
+    "claude",
+    "cursor",
+    "windsurf",
+    "mcp-checkup",
+    "schema-analysis"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yifanyifan897645/mcp-checkup"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "js-tiktoken": "^1.0.18"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.0.0"
+  }
+}
