@@ -116,6 +116,16 @@ mcp-checkup automatically finds your MCP config in these locations:
 
 Or pass a custom path to any tool.
 
+## How It Compares
+
+| Tool | Purpose | Approach |
+|------|---------|----------|
+| **mcp-checkup** | Diagnose token costs | Analyze & report — see exactly what each tool costs |
+| [lean-ctx](https://github.com/yvgude/lean-ctx) | Reduce token usage | Compress context at runtime |
+| [MCP Inspector](https://github.com/modelcontextprotocol/inspector) | Debug MCP servers | Test connections and tool calls |
+
+**Use mcp-checkup first** to find the problem, then decide how to fix it.
+
 ## Part of the MCP Toolkit
 
 **[View all servers →](https://yifanyifan897645.github.io/mcp-toolkit/)**
