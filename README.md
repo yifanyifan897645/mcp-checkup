@@ -1,13 +1,13 @@
-# mcp-health
+# mcp-checkup
 
 Your MCP servers are eating your context window. Find out how much.
 
-**mcp-health** is an MCP server that analyzes your MCP setup — measuring the token cost of every installed server and tool, finding duplicates, grading efficiency, and generating optimization reports.
+**mcp-checkup** is an MCP server that analyzes your MCP setup — measuring the token cost of every installed server and tool, finding duplicates, grading efficiency, and generating optimization reports.
 
 ## Quick Start
 
 ```bash
-npx mcp-health
+npx mcp-checkup
 ```
 
 Then ask your AI assistant:
@@ -91,9 +91,9 @@ Full markdown health report: server grades (A-F), token costs, duplicates, and a
 ```json
 {
   "mcpServers": {
-    "mcp-health": {
+    "mcp-checkup": {
       "command": "npx",
-      "args": ["-y", "mcp-health"]
+      "args": ["-y", "mcp-checkup"]
     }
   }
 }
@@ -105,12 +105,22 @@ Add to `.cursor/mcp.json` with the same format.
 
 ## Auto-Detection
 
-mcp-health automatically finds your MCP config in these locations:
+mcp-checkup automatically finds your MCP config in these locations:
 - `.mcp.json` (current directory)
 - Claude Desktop config (Windows/macOS/Linux)
 - `.cursor/mcp.json`
 
 Or pass a custom path to any tool.
+
+## Part of the MCP Toolkit
+
+**[View all servers →](https://yifanyifan897645.github.io/mcp-toolkit/)**
+
+- [webcheck-mcp](https://www.npmjs.com/package/webcheck-mcp) — Website health analysis
+- [git-summary-mcp](https://www.npmjs.com/package/git-summary-mcp) — Git repository intelligence
+- [mcp-checkup](https://www.npmjs.com/package/mcp-checkup) — MCP setup health analyzer
+- [dev-utils-mcp](https://www.npmjs.com/package/dev-utils-mcp) — Developer utilities
+- [codescan-mcp](https://www.npmjs.com/package/codescan-mcp) — Codebase health scanner
 
 ## License
 
