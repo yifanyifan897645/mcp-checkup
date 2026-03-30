@@ -1,5 +1,9 @@
 # mcp-checkup
 
+[![npm version](https://img.shields.io/npm/v/mcp-checkup.svg)](https://www.npmjs.com/package/mcp-checkup)
+[![npm downloads](https://img.shields.io/npm/dm/mcp-checkup.svg)](https://www.npmjs.com/package/mcp-checkup)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Your MCP servers are eating your context window. Find out how much.
 
 **mcp-checkup** is an MCP server that analyzes your MCP setup — measuring the token cost of every installed server and tool, finding duplicates, grading efficiency, and generating optimization reports.
