@@ -1,6 +1,7 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { McpServerConfig } from "./config-reader.js";
+import { createHash } from "node:crypto";
 import { analyzeToolTokens, ToolTokenAnalysis } from "./token-counter.js";
 
 export interface ServerAnalysis {
@@ -106,6 +107,89 @@ export function findDuplicateTools(
   return Array.from(toolMap.entries())
     .filter(([, servers]) => servers.length > 1)
     .map(([toolName, servers]) => ({ toolName, servers }));
+}
+
+function sha256(value: string): string {
+  return createHash("sha256").update(value).digest("hex");
+}
+
+function tokenBucket(tokens: number): string {
+  if (tokens <= 500) return "0-500";
+  if (tokens <= 1500) return "501-1500";
+  if (tokens <= 3000) return "1501-3000";
+  if (tokens <= 6000) return "3001-6000";
+  if (tokens <= 12000) return "6001-12000";
+  return "12000+";
+}
+
+export interface ContextSelectionReceipt {
+  receipt_type: "mcp.context.selection.evaluated";
+  receipt_version: "0.1";
+  privacy: {
+    raw_tool_schemas_included: false;
+    raw_tool_descriptions_included: false;
+    raw_config_path_included: false;
+    raw_commands_or_env_included: false;
+  };
+  config_path_hash: string;
+  candidate_server_count: number;
+  candidate_tool_count: number;
+  selected_server_count: number;
+  selected_tool_count: number;
+  suppressed_server_count: number;
+  suppressed_tool_count: number;
+  delivered_hash_count: number;
+  duplicate_tool_name_count: number;
+  total_token_bucket: string;
+  servers: Array<{
+    server_hash: string;
+    grade: ServerAnalysis["grade"];
+    tool_count: number;
+    token_bucket: string;
+    highest_cost_tool_hashes: string[];
+    error: boolean;
+  }>;
+}
+
+export function generateContextSelectionReceipt(
+  servers: ServerAnalysis[],
+  configPath: string
+): ContextSelectionReceipt {
+  const duplicates = findDuplicateTools(servers);
+  const analyzedServers = servers.filter((server) => !server.error);
+  const totalTokens = analyzedServers.reduce((sum, server) => sum + server.totalTokens, 0);
+  const selectedToolCount = analyzedServers.reduce((sum, server) => sum + server.toolCount, 0);
+  const erroredServers = servers.filter((server) => Boolean(server.error));
+  const suppressedToolCount = erroredServers.reduce((sum, server) => sum + server.toolCount, 0);
+
+  return {
+    receipt_type: "mcp.context.selection.evaluated",
+    receipt_version: "0.1",
+    privacy: {
+      raw_tool_schemas_included: false,
+      raw_tool_descriptions_included: false,
+      raw_config_path_included: false,
+      raw_commands_or_env_included: false,
+    },
+    config_path_hash: sha256(configPath),
+    candidate_server_count: servers.length,
+    candidate_tool_count: selectedToolCount + suppressedToolCount,
+    selected_server_count: analyzedServers.length,
+    selected_tool_count: selectedToolCount,
+    suppressed_server_count: erroredServers.length,
+    suppressed_tool_count: suppressedToolCount,
+    delivered_hash_count: selectedToolCount,
+    duplicate_tool_name_count: duplicates.length,
+    total_token_bucket: tokenBucket(totalTokens),
+    servers: servers.map((server) => ({
+      server_hash: sha256(server.name),
+      grade: server.grade,
+      tool_count: server.toolCount,
+      token_bucket: tokenBucket(server.totalTokens),
+      highest_cost_tool_hashes: server.tools.slice(0, 5).map((tool) => sha256(`${server.name}/${tool.name}`)),
+      error: Boolean(server.error),
+    })),
+  };
 }
 
 export function generateReport(

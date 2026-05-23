@@ -4,7 +4,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import { findConfigFiles, readConfigFile } from "./config-reader.js";
-import { analyzeServer, findDuplicateTools, generateReport, ServerAnalysis } from "./analyzer.js";
+import { analyzeServer, findDuplicateTools, generateContextSelectionReceipt, generateReport, ServerAnalysis } from "./analyzer.js";
 import { countTokens } from "./token-counter.js";
 
 const server = new McpServer({
@@ -171,7 +171,51 @@ server.tool(
   }
 );
 
-// Tool 5: Generate full markdown report
+// Tool 5: Generate a privacy-safe context selection receipt
+server.tool(
+  "generate_context_receipt",
+  "Generate a privacy-safe JSON receipt for MCP tool context selection. Includes counts, token buckets, hashes, and duplicate counts without raw tool schemas, descriptions, config paths, commands, or env values.",
+  {
+    config_path: z
+      .string()
+      .optional()
+      .describe("Path to MCP config file. Auto-detects if not provided."),
+  },
+  async ({ config_path }) => {
+    let configs: Array<{ path: string; config: { mcpServers: Record<string, any> } }>;
+
+    if (config_path) {
+      configs = [{ path: config_path, config: readConfigFile(config_path) }];
+    } else {
+      configs = findConfigFiles();
+    }
+
+    if (configs.length === 0) {
+      return {
+        content: [{
+          type: "text",
+          text: JSON.stringify({ error: "No MCP config files found." }, null, 2),
+        }],
+      };
+    }
+
+    const receipts = [];
+    for (const { path, config } of configs) {
+      const servers: ServerAnalysis[] = [];
+      for (const [name, serverConfig] of Object.entries(config.mcpServers)) {
+        const analysis = await analyzeServer(name, serverConfig);
+        servers.push(analysis);
+      }
+      receipts.push(generateContextSelectionReceipt(servers, path));
+    }
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(receipts, null, 2) }],
+    };
+  }
+);
+
+// Tool 6: Generate full markdown report
 server.tool(
   "generate_report",
   "Generate a comprehensive markdown health report for your MCP setup. Includes grades, token costs, duplicates, and optimization recommendations.",
