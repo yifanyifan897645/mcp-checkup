@@ -68,6 +68,13 @@ Full markdown health report: server grades (A-F), token costs, duplicates, and a
 "Generate a full MCP health report"
 ```
 
+### `generate_context_receipt`
+Generate a privacy-safe JSON receipt for MCP tool context selection. The receipt keeps counts, token buckets, duplicate counts, and hashes, but does not include raw tool schemas, tool descriptions, config paths, commands, or environment values.
+
+```
+"Generate a privacy-safe MCP context receipt"
+```
+
 ## Grading System
 
 ### Per-Tool Grades
